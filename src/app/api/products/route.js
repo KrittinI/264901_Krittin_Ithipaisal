@@ -1,4 +1,4 @@
-import { products } from "../../../../constants/products";
+import { categories, products } from "../../../../constants/products";
 
 export async function GET(request) {
   const searchParams = request.nextUrl.searchParams;
@@ -6,6 +6,12 @@ export async function GET(request) {
 
   if (!query) {
     return Response.json({ products }).status(200);
+  }
+
+  if (!categories.includes(query)) {
+    return new Response(`Invalid category.`, {
+      status: 400,
+    });
   }
 
   return Response.json({

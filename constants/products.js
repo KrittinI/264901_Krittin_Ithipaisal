@@ -42,3 +42,5 @@ export const products = [
     price: 1200,
   },
 ];
+
+export const categories = ["clothing", "accessories", "electronics"];
