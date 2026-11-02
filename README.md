@@ -1,36 +1,179 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Assignment #1
 
-## Getting Started
+The discount module is to calculate the final price of an order by applying multiple discount campaigns to
+items added to the shopping cart. The campaigns are as listed below:
 
-First, run the development server:
+| Campaigns                            | Category | Discount Rules                                                                                                                                                                                      | Examples                                                                                                                                                         |
+| ------------------------------------ | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Fixed amount                         | Coupon   | Discounts the entire cart by subtracting an amount from the total price<br><br>Parameters:<br>\* Amount                                                                                             | Items in cart:<br>1 T-Shirt: 350 THB<br>1 Hat: 250 THB<br><br>Discount: 50 THB<br>Total Price: 550 THB                                                           |
+| Percentage discount                  | Coupon   | Discounts the entire cart by subtracting a percentage from the total price<br><br>Parameters:<br>\* Percentage                                                                                      | Items in cart:<br>1 T-Shirt: 350 THB<br>1 Hat: 250 THB<br><br>Discount: 10%<br>Total Price: 540 THB                                                              |
+| Percentage discount by item category | On Top   | Discount the entire amount of a specific category of items in cart<br><br>Parameters:<br>_ Category (Clothing, Accessories, Electronics)<br>_ Amount                                                | Items in cart:<br>1 T-Shirt: 350 THB<br>1 Hoodie: 700 THB<br>1 Watch: 850 THB<br>1 Bag: 640 THB<br><br>Discount: 15% Off on Clothing<br>Total Price: 2,382.5 THB |
+| Discount by points                   | On Top   | Users spent points for a fixed amount of discount (1 point = 1 THB). The amount will be capped at 20% of total price<br><br>Parameters:<br>\* Customer points<br><br>Noted that “20%” is fixed rule | Items in cart:<br>1 T-Shirt: 350 THB<br>1 Hat: 250 THB<br>1 Belt: 230 THB<br><br>Points: 68 Points<br><br>Total Price: 762 THB                                   |
+| Special campaigns                    | Seasonal | From the total price, at every X THB, subtracting a fixed amount Y THB<br><br>Parameters:<br>_ Every X THB<br>_ Discount Y THB                                                                      | Items in cart:<br>1 T-Shirt: 350 THB<br>1 Hat: 250 THB<br>1 Belt: 230 THB<br><br>Discount: 40 THB at every 300 THB<br>Total Price: 750 THB                       |
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Users can apply multiple discount campaigns in an order. However, there are rules for applying as below:
+
+- Apply only one campaign from the same category, i.e. users have to choose either Fixed amount or
+  Percentage discount.
+- The order of applying campaigns is **Coupon > On Top > Seasonal**.
+
+## Your task is to create the discount module that has the following attributes:
+
+- Take the list items in a shopping cart.
+- Take the list of discount campaigns and their parameters to apply.
+- Calculate the final price according to the rules.
+
+### In order assumptions for applying order to discion
+
+Method POST /orders
+
+```json
+{
+  "orders": [{ "id": 1, "amount": 1 }],
+  "coupon": "",
+  "onTop": "",
+  "seasonal": ""
+}
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+type percentage not more than 100
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+Method POST /coupons
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```json
+{
+  "type": "fixed | percentage",
+  "amount": 10
+}
+```
 
-## Learn More
+Method PUT /coupons/:couponId
 
-To learn more about Next.js, take a look at the following resources:
+```json
+{
+  "type": "fixed | percentage",
+  "amount": 10
+}
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Method GET /coupons
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```json
+{
+  "coupons": [{ "id": 1, "type": "fixed | percentage", "amount": 10 }]
+}
+```
 
-## Deploy on Vercel
+Method POST /ontop
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```json
+{
+  "type": "clothing | accessories | electronics | points",
+  "amount": 10
+}
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Method PUT /ontop/:ontopId
+
+```json
+{
+  "type": "clothing | accessories | electronics | points",
+  "amount": 10
+}
+```
+
+Method GET /ontop
+
+```json
+{
+  "ontop": []
+}
+```
+
+condition for seasonal
+discount not greater than every
+ex:
+
+```json
+{
+  "every": 10,
+  "discount": 100
+}
+```
+
+Method POST /seasonal
+
+```json
+{
+  "every": 10,
+  "discount": 1
+}
+```
+
+Method PUT /seasonal/sesaonalId
+
+```json
+{
+  "every": 10,
+  "discount": 1
+}
+```
+
+Method GET /seasonal
+
+```json
+{
+  "seasonal": []
+}
+```
+
+Method GET /products
+
+```json
+{
+  "products": [
+    {
+      "id": 1,
+      "name": "T-Shirt",
+      "category": "Clothing",
+      "price": 350
+    },
+    {
+      "id": 2,
+      "name": "Hat",
+      "category": "Accessories",
+      "price": 250
+    },
+    {
+      "id": 3,
+      "name": "Hoodie",
+      "category": "Clothing",
+      "price": 700
+    },
+    {
+      "id": 4,
+      "name": "Watch",
+      "category": "Electronics",
+      "price": 850
+    },
+    {
+      "id": 5,
+      "name": "Bag",
+      "category": "Accessories",
+      "price": 640
+    },
+    {
+      "id": 6,
+      "name": "Belt",
+      "category": "Accessories",
+      "price": 230
+    },
+    {
+      "id": 7,
+      "name": "Shoes",
+      "category": "Clothing",
+      "price": 1200
+    }
+  ]
+}
+```
