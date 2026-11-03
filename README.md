@@ -25,83 +25,439 @@ items added to the shopping cart. The campaigns are as listed below:
 
 ### In order assumptions for applying order to discion
 
-Method POST /orders
+# API Specification — Discount Campaign
+
+## Table of Contents
+
+- [Orders](#orders)
+- [Coupons](#coupons)
+- [On-top Campaigns](#on-top-campaigns)
+- [Seasonal Campaigns](#seasonal-campaigns)
+- [Products](#products)
+- [Error Responses](#error-responses)
+
+---
+
+# Orders
+
+## POST `/orders`
+
+Create a new order and calculate applicable discounts.
+
+### Request Body
 
 ```json
 {
-  "orders": [{ "id": 1, "amount": 1 }],
+  "orders": [
+    {
+      "id": 1,
+      "amount": 1
+    }
+  ],
   "coupon": "",
   "onTop": "",
   "seasonal": ""
 }
 ```
 
-type percentage not more than 100
+### Field Description
 
-Method POST /coupons
+| Field             | Type   | Required | Description                   |
+| ----------------- | ------ | -------- | ----------------------------- |
+| `orders`          | Array  | Yes      | List of products in the order |
+| `orders[].id`     | Number | Yes      | Product ID                    |
+| `orders[].amount` | Number | Yes      | Product quantity              |
+| `coupon`          | String | No       | Coupon ID                     |
+| `onTop`           | String | No       | On-top campaign ID            |
+| `seasonal`        | String | No       | Seasonal campaign ID          |
+
+### Validation Rules
+
+- `orders` must contain at least one product.
+- Product quantity must be greater than 0.
+- Percentage discount must not exceed 100%.
+- Discount amount must not exceed the applicable subtotal.
+- Each campaign type can be applied at most once per order.
+
+### Example Response — 201 Created
 
 ```json
 {
-  "type": "fixed | percentage",
+  "orderId": 1,
+  "subtotal": 1350,
+  "discount": {
+    "coupon": 100,
+    "onTop": 50,
+    "seasonal": 100
+  },
+  "totalDiscount": 250,
+  "total": 1100
+}
+```
+
+---
+
+## PATCH `/orders/:orderId`
+
+Update specific fields of an existing order.
+
+### Path Parameter
+
+| Field     | Type   | Required | Description |
+| --------- | ------ | -------- | ----------- |
+| `orderId` | Number | Yes      | Order ID    |
+
+### Request Body
+
+```json
+{
+  "orders": [
+    {
+      "id": 1,
+      "amount": 2
+    }
+  ],
+  "coupon": "1"
+}
+```
+
+### Field Description
+
+| Field             | Type   | Required | Description          |
+| ----------------- | ------ | -------- | -------------------- |
+| `orders`          | Array  | No       | Updated product list |
+| `orders[].id`     | Number | Yes\*    | Product ID           |
+| `orders[].amount` | Number | Yes\*    | Product quantity     |
+| `coupon`          | String | No       | Coupon ID            |
+| `onTop`           | String | No       | On-top campaign ID   |
+| `seasonal`        | String | No       | Seasonal campaign ID |
+
+_Required when an item is included in the `orders` array._
+
+### Validation Rules
+
+- At least one field must be provided.
+- Product quantity must be greater than 0.
+- Referenced campaigns must exist.
+- Percentage discount must not exceed 100%.
+- Order subtotal, discounts, and total must be recalculated after updating.
+
+### Example Response — 200 OK
+
+```json
+{
+  "orderId": 1,
+  "subtotal": 700,
+  "discount": {
+    "coupon": 100,
+    "onTop": 50,
+    "seasonal": 10
+  },
+  "totalDiscount": 160,
+  "total": 540
+}
+```
+
+---
+
+# Coupons
+
+## POST `/coupons`
+
+Create a new coupon.
+
+### Request Body
+
+```json
+{
+  "type": "fixed",
   "amount": 10
 }
 ```
 
-Method PUT /coupons/:couponId
+### Field Description
+
+| Field    | Type   | Required | Description                            |
+| -------- | ------ | -------- | -------------------------------------- |
+| `type`   | String | Yes      | Discount type: `fixed` or `percentage` |
+| `amount` | Number | Yes      | Discount amount or percentage          |
+
+### Validation Rules
+
+- `type` must be `fixed` or `percentage`.
+- `amount` must be greater than 0.
+- If `type` is `percentage`, `amount` must not exceed 100.
+
+### Example Response — 201 Created
 
 ```json
 {
-  "type": "fixed | percentage",
+  "id": 1,
+  "type": "fixed",
   "amount": 10
 }
 ```
 
-Method GET /coupons
+---
+
+## PUT `/coupons/:couponId`
+
+Update an existing coupon.
+
+### Path Parameter
+
+| Field      | Type   | Required | Description |
+| ---------- | ------ | -------- | ----------- |
+| `couponId` | Number | Yes      | Coupon ID   |
+
+### Request Body
 
 ```json
 {
-  "coupons": [{ "id": 1, "type": "fixed | percentage", "amount": 10 }]
+  "type": "percentage",
+  "amount": 20
 }
 ```
 
-Method POST /ontop
+### Example Response — 200 OK
 
 ```json
 {
-  "type": "clothing | accessories | electronics | points",
+  "id": 1,
+  "type": "percentage",
+  "amount": 20
+}
+```
+
+---
+
+## PATCH `/coupons/:couponId`
+
+Update specific fields of an existing coupon.
+
+### Path Parameter
+
+| Field      | Type   | Required | Description |
+| ---------- | ------ | -------- | ----------- |
+| `couponId` | Number | Yes      | Coupon ID   |
+
+### Request Body
+
+```json
+{
+  "amount": 20
+}
+```
+
+### Field Description
+
+| Field    | Type   | Required | Description                            |
+| -------- | ------ | -------- | -------------------------------------- |
+| `type`   | String | No       | Discount type: `fixed` or `percentage` |
+| `amount` | Number | No       | Discount amount or percentage          |
+
+### Validation Rules
+
+- At least one field must be provided.
+- `type` must be `fixed` or `percentage`.
+- `amount` must be greater than 0.
+- Percentage discount must not exceed 100%.
+
+### Example Response — 200 OK
+
+```json
+{
+  "id": 1,
+  "type": "percentage",
+  "amount": 20
+}
+```
+
+---
+
+## GET `/coupons`
+
+Retrieve all coupons.
+
+### Example Response — 200 OK
+
+```json
+{
+  "coupons": [
+    {
+      "id": 1,
+      "type": "fixed",
+      "amount": 10
+    },
+    {
+      "id": 2,
+      "type": "percentage",
+      "amount": 20
+    }
+  ]
+}
+```
+
+---
+
+# On-top Campaigns
+
+## POST `/ontop`
+
+Create a new On-top campaign.
+
+### Request Body
+
+```json
+{
+  "type": "clothing",
   "amount": 10
 }
 ```
 
-Method PUT /ontop/:ontopId
+### Field Description
+
+| Field    | Type   | Required | Description       |
+| -------- | ------ | -------- | ----------------- |
+| `type`   | String | Yes      | Campaign category |
+| `amount` | Number | Yes      | Discount amount   |
+
+### Supported Types
+
+| Type          | Description                       |
+| ------------- | --------------------------------- |
+| `clothing`    | Discount for clothing products    |
+| `accessories` | Discount for accessories products |
+| `electronics` | Discount for electronics products |
+| `points`      | Discount based on customer points |
+
+### Validation Rules
+
+- `type` must be one of the supported types.
+- `amount` must be greater than 0.
+- Percentage discount must not exceed 100%.
+
+### Example Response — 201 Created
 
 ```json
 {
-  "type": "clothing | accessories | electronics | points",
+  "id": 1,
+  "type": "clothing",
   "amount": 10
 }
 ```
 
-Method GET /ontop
+---
+
+## PUT `/ontop/:ontopId`
+
+Update an existing On-top campaign.
+
+### Path Parameter
+
+| Field     | Type   | Required | Description        |
+| --------- | ------ | -------- | ------------------ |
+| `ontopId` | Number | Yes      | On-top campaign ID |
+
+### Request Body
 
 ```json
 {
-  "ontop": []
+  "type": "accessories",
+  "amount": 15
 }
 ```
 
-condition for seasonal
-discount not greater than every
-ex:
+### Example Response — 200 OK
 
 ```json
 {
-  "every": 10,
-  "discount": 100
+  "id": 1,
+  "type": "accessories",
+  "amount": 15
 }
 ```
 
-Method POST /seasonal
+---
+
+## PATCH `/ontop/:ontopId`
+
+Update specific fields of an existing On-top campaign.
+
+### Path Parameter
+
+| Field     | Type   | Required | Description        |
+| --------- | ------ | -------- | ------------------ |
+| `ontopId` | Number | Yes      | On-top campaign ID |
+
+### Request Body
+
+```json
+{
+  "amount": 15
+}
+```
+
+### Field Description
+
+| Field    | Type   | Required | Description       |
+| -------- | ------ | -------- | ----------------- |
+| `type`   | String | No       | Campaign category |
+| `amount` | Number | No       | Discount amount   |
+
+### Validation Rules
+
+- At least one field must be provided.
+- `type` must be one of the supported types.
+- `amount` must be greater than 0.
+- Percentage discount must not exceed 100%.
+
+### Example Response — 200 OK
+
+```json
+{
+  "id": 1,
+  "type": "clothing",
+  "amount": 15
+}
+```
+
+---
+
+## GET `/ontop`
+
+Retrieve all On-top campaigns.
+
+### Example Response — 200 OK
+
+```json
+{
+  "ontop": [
+    {
+      "id": 1,
+      "type": "clothing",
+      "amount": 10
+    },
+    {
+      "id": 2,
+      "type": "points",
+      "amount": 100
+    }
+  ]
+}
+```
+
+---
+
+# Seasonal Campaigns
+
+## Discount Condition
+
+The `every` field defines the spending threshold required to receive a discount.
+
+The `discount` field defines the discount amount for each threshold.
+
+### Example
 
 ```json
 {
@@ -110,7 +466,37 @@ Method POST /seasonal
 }
 ```
 
-Method PUT /seasonal/sesaonalId
+For every 10 THB spent, the customer receives a 1 THB discount.
+
+### Calculation Formula
+
+```text
+Total Discount = floor(Subtotal / Every) * Discount
+```
+
+### Example Calculation
+
+| Subtotal | Every | Discount | Total Discount |
+| -------: | ----: | -------: | -------------: |
+|       10 |    10 |        1 |              1 |
+|       50 |    10 |        1 |              5 |
+|      100 |    10 |        1 |             10 |
+|      105 |    10 |        1 |             10 |
+
+### Validation Rules
+
+- `every` must be greater than 0.
+- `discount` must be greater than 0.
+- `discount` must not exceed `every`.
+- Total discount must not exceed the applicable subtotal.
+
+---
+
+## POST `/seasonal`
+
+Create a new Seasonal campaign.
+
+### Request Body
 
 ```json
 {
@@ -119,15 +505,132 @@ Method PUT /seasonal/sesaonalId
 }
 ```
 
-Method GET /seasonal
+### Field Description
+
+| Field      | Type   | Required | Description                   |
+| ---------- | ------ | -------- | ----------------------------- |
+| `every`    | Number | Yes      | Spending threshold            |
+| `discount` | Number | Yes      | Discount amount per threshold |
+
+### Example Response — 201 Created
 
 ```json
 {
-  "seasonal": []
+  "id": 1,
+  "every": 10,
+  "discount": 1
 }
 ```
 
-Method GET /products
+---
+
+## PUT `/seasonal/:seasonalId`
+
+Update an existing Seasonal campaign.
+
+### Path Parameter
+
+| Field        | Type   | Required | Description          |
+| ------------ | ------ | -------- | -------------------- |
+| `seasonalId` | Number | Yes      | Seasonal campaign ID |
+
+### Request Body
+
+```json
+{
+  "every": 10,
+  "discount": 1
+}
+```
+
+### Example Response — 200 OK
+
+```json
+{
+  "id": 1,
+  "every": 10,
+  "discount": 1
+}
+```
+
+---
+
+## PATCH `/seasonal/:seasonalId`
+
+Update specific fields of an existing Seasonal campaign.
+
+### Path Parameter
+
+| Field        | Type   | Required | Description          |
+| ------------ | ------ | -------- | -------------------- |
+| `seasonalId` | Number | Yes      | Seasonal campaign ID |
+
+### Request Body
+
+```json
+{
+  "discount": 2
+}
+```
+
+### Field Description
+
+| Field      | Type   | Required | Description                   |
+| ---------- | ------ | -------- | ----------------------------- |
+| `every`    | Number | No       | Spending threshold            |
+| `discount` | Number | No       | Discount amount per threshold |
+
+### Validation Rules
+
+- At least one field must be provided.
+- `every` must be greater than 0.
+- `discount` must be greater than 0.
+- `discount` must not exceed `every`.
+
+### Example Response — 200 OK
+
+```json
+{
+  "id": 1,
+  "every": 10,
+  "discount": 2
+}
+```
+
+---
+
+## GET `/seasonal`
+
+Retrieve all Seasonal campaigns.
+
+### Example Response — 200 OK
+
+```json
+{
+  "seasonal": [
+    {
+      "id": 1,
+      "every": 10,
+      "discount": 1
+    },
+    {
+      "id": 2,
+      "every": 500,
+      "discount": 50
+    }
+  ]
+}
+```
+
+---
+
+# Products
+
+## GET `/products`
+
+Retrieve all available products.
+
+### Example Response — 200 OK
 
 ```json
 {
@@ -175,5 +678,62 @@ Method GET /products
       "price": 1200
     }
   ]
+}
+```
+
+### Field Description
+
+| Field      | Type   | Description          |
+| ---------- | ------ | -------------------- |
+| `id`       | Number | Product ID           |
+| `name`     | String | Product name         |
+| `category` | String | Product category     |
+| `price`    | Number | Product price in THB |
+
+### Supported Categories
+
+| Category      | Description          |
+| ------------- | -------------------- |
+| `Clothing`    | Clothing products    |
+| `Accessories` | Accessories products |
+| `Electronics` | Electronics products |
+
+---
+
+# Error Responses
+
+## 400 Bad Request
+
+Invalid request data or validation failure.
+
+```json
+{
+  "statusCode": 400,
+  "message": "Percentage discount must not exceed 100",
+  "error": "Bad Request"
+}
+```
+
+## 404 Not Found
+
+Requested resource does not exist.
+
+```json
+{
+  "statusCode": 404,
+  "message": "Coupon not found",
+  "error": "Not Found"
+}
+```
+
+## 500 Internal Server Error
+
+Unexpected server error.
+
+```json
+{
+  "statusCode": 500,
+  "message": "Internal server error",
+  "error": "Internal Server Error"
 }
 ```
