@@ -25,4 +25,14 @@ test("GET /api/products returns products and validates category filters", async 
     makeRequest("http://localhost/api/products?category=unknown")
   );
   assert.equal(invalidResponse.status, 400);
+
+  const inheritedCategoryResponse = await productsRoute.GET(
+    makeRequest("http://localhost/api/products?category=constructor")
+  );
+  assert.equal(inheritedCategoryResponse.status, 400);
+
+  const emptyCategoryResponse = await productsRoute.GET(
+    makeRequest("http://localhost/api/products?category=")
+  );
+  assert.equal(emptyCategoryResponse.status, 400);
 });
