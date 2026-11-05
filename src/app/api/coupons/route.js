@@ -5,7 +5,7 @@ export async function GET(request) {
   const type = searchParams.get("type");
 
   if (!type) {
-    return Response.json({ products }, { status: 200 });
+    return Response.json({ coupons }, { status: 200 });
   }
 
   if (!COUPON_TYPE[type]) {
