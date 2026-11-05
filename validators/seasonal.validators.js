@@ -1,5 +1,5 @@
 export function validateSeasonal({ every, discount }) {
-  let error = {};
+  const error = {};
 
   if (isNaN(every) || every < 0) {
     error.every = "INVALID_EVERY";
