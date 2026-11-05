@@ -33,7 +33,7 @@ export async function PUT(request, { params }) {
     error.every = "INVALID_EVERY";
   }
 
-  if (isNaN(discount) || discount < 0 || discount >= every) {
+  if (isNaN(discount) || discount < 0 || Number(discount) >= Number(every)) {
     error.discount = "INVALID_DISCOUNT";
   }
 
