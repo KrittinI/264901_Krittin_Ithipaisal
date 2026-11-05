@@ -305,6 +305,24 @@ Retrieve all coupons.
 
 ---
 
+## GET `/coupons/:couponId`
+
+Retrieve coupon by Id.
+
+### Example Response — 200 OK
+
+```json
+{
+  "coupon": {
+    "id": 1,
+    "type": "fixed",
+    "amount": 10
+  }
+}
+```
+
+---
+
 # On-top Campaigns
 
 ## POST `/ontop`
@@ -1333,7 +1351,7 @@ Retrieve all On-top campaigns.
 
 ```json
 {
-  "ontop": [
+  "ontops": [
     {
       "id": "1",
 
@@ -1350,6 +1368,26 @@ Retrieve all On-top campaigns.
       "amount": 100
     }
   ]
+}
+```
+
+---
+
+## GET `/ontop/:ontopId`
+
+Retrieve On-top campaigns by Id.
+
+### Example Response — 200 OK
+
+```json
+{
+  "ontop": {
+    "id": "1",
+
+    "type": "clothing",
+
+    "amount": 10
+  }
 }
 ```
 
@@ -1561,7 +1599,7 @@ Retrieve all Seasonal campaigns.
 
 ```json
 {
-  "seasonal": [
+  "seasonals": [
     {
       "id": "1",
 
@@ -1578,6 +1616,26 @@ Retrieve all Seasonal campaigns.
       "discount": 50
     }
   ]
+}
+```
+
+---
+
+## GET `/seasonal/:seasinalId`
+
+Retrieve Seasonal campaigns by Id.
+
+### Example Response — 200 OK
+
+```json
+{
+  "seasonal": {
+    "id": "1",
+
+    "every": 10,
+
+    "discount": 1
+  }
 }
 ```
 
