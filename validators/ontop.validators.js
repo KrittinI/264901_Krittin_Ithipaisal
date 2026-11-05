@@ -3,12 +3,17 @@ import { ONTOP_TYPE } from "../constants";
 export function validateOntop({ amount, type }) {
   const error = {};
 
-  if (!ONTOP_TYPE[type]) {
+  if (!Object.hasOwn(ONTOP_TYPE, type)) {
     error.type = "INVALID_TYPE";
   }
 
   if (type !== ONTOP_TYPE.points) {
-    if (isNaN(amount) || amount < 0 || amount >= 100) {
+    if (
+      typeof amount !== "number" ||
+      !Number.isFinite(amount) ||
+      amount < 0 ||
+      amount >= 100
+    ) {
       error.amount = "INVALID_AMOUNT";
     }
   } else {

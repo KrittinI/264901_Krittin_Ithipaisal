@@ -1,4 +1,4 @@
-import { COUPON_TYPE, coupons } from "../../../../constants";
+import { allocateCouponId, COUPON_TYPE, coupons } from "../../../../constants";
 import { validateCoupon } from "../../../../validators";
 
 export async function GET(request) {
@@ -9,7 +9,7 @@ export async function GET(request) {
     return Response.json({ coupons }, { status: 200 });
   }
 
-  if (!COUPON_TYPE[type]) {
+  if (!Object.hasOwn(COUPON_TYPE, type)) {
     return Response.json({ message: `Invalid type.` }, { status: 400 });
   }
 
@@ -27,7 +27,8 @@ export async function POST(request) {
     return Response.json({ message: `Bad Request.`, error }, { status: 400 });
   }
 
-  const id = coupons.push({ id: String(coupons.length), type, amount });
+  const id = allocateCouponId();
+  coupons.push({ id, type, amount });
 
   return Response.json(
     { message: "Create coupon success.", id },

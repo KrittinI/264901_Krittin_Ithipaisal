@@ -1,11 +1,16 @@
 export function validateSeasonal({ every, discount }) {
   const error = {};
 
-  if (isNaN(every) || every < 0) {
+  if (typeof every !== "number" || !Number.isFinite(every) || every < 0) {
     error.every = "INVALID_EVERY";
   }
 
-  if (isNaN(discount) || discount < 0 || Number(discount) >= Number(every)) {
+  if (
+    typeof discount !== "number" ||
+    !Number.isFinite(discount) ||
+    discount < 0 ||
+    discount >= every
+  ) {
     error.discount = "INVALID_DISCOUNT";
   }
 

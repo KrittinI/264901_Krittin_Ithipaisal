@@ -16,7 +16,7 @@ export async function GET(request, { params }) {
 }
 
 export async function PUT(request, { params }) {
-  const { type, amount } = await request.json();
+  const { every, discount } = await request.json();
 
   const { seasonalId } = await params;
 
@@ -36,7 +36,7 @@ export async function PUT(request, { params }) {
 
   const seasonal = seasonals[seasonalIndex];
 
-  seasonals.splice(seasonalIndex, 1, { ...seasonal, type, amount });
+  seasonals.splice(seasonalIndex, 1, { ...seasonal, every, discount });
 
   return Response.json({ message: `Update Success.` }, { status: 200 });
 }

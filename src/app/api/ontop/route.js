@@ -1,4 +1,4 @@
-import { ONTOP_TYPE, ontops } from "../../../../constants";
+import { allocateOntopId, ONTOP_TYPE, ontops } from "../../../../constants";
 import { validateOntop } from "../../../../validators";
 
 export async function GET(request) {
@@ -9,7 +9,7 @@ export async function GET(request) {
     return Response.json({ ontops }, { status: 200 });
   }
 
-  if (!ONTOP_TYPE[type]) {
+  if (!Object.hasOwn(ONTOP_TYPE, type)) {
     return Response.json({ message: `Invalid type.` }, { status: 400 });
   }
 
@@ -27,7 +27,8 @@ export async function POST(request) {
     return Response.json({ message: `Bad Request.`, error }, { status: 400 });
   }
 
-  const id = ontops.push({ id: String(ontops.length), type, amount });
+  const id = allocateOntopId();
+  ontops.push({ id, type, amount });
 
   return Response.json(
     { message: "Create ontop success.", id },
