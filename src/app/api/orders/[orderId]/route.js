@@ -9,9 +9,3 @@ export async function PUT(request, { params }) {
   const res = await request.json();
   return Response.json({ res });
 }
-export async function PATCH(request, { params }) {
-  const { orderId } = await params;
-
-  const res = await request.json();
-  return Response.json({ res });
-}

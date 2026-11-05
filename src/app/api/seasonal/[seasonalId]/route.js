@@ -1,5 +1,6 @@
 import { seasonals } from "../../../../../constants";
 import { validateSeasonal } from "../../../../../validators";
+import { readJsonObject } from "../../_utils/request";
 
 export async function GET(request, { params }) {
   const { seasonalId } = await params;
@@ -16,7 +17,15 @@ export async function GET(request, { params }) {
 }
 
 export async function PUT(request, { params }) {
-  const { every, discount } = await request.json();
+  const body = await readJsonObject(request);
+  if (!body) {
+    return Response.json(
+      { message: "Bad Request.", error: { body: "INVALID_JSON_OBJECT" } },
+      { status: 400 }
+    );
+  }
+
+  const { every, discount } = body;
 
   const { seasonalId } = await params;
 
@@ -39,13 +48,6 @@ export async function PUT(request, { params }) {
   seasonals.splice(seasonalIndex, 1, { ...seasonal, every, discount });
 
   return Response.json({ message: `Update Success.` }, { status: 200 });
-}
-
-export async function PATCH(request, { params }) {
-  const { seasonalId } = await params;
-
-  const res = await request.json();
-  return Response.json({ res });
 }
 
 export async function DELETE({ params }) {

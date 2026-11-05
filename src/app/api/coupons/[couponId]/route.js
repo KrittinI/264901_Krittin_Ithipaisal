@@ -1,5 +1,6 @@
 import { coupons } from "../../../../../constants";
 import { validateCoupon } from "../../../../../validators";
+import { readJsonObject } from "../../_utils/request";
 
 export async function GET(request, { params }) {
   const { couponId } = await params;
@@ -14,7 +15,15 @@ export async function GET(request, { params }) {
 }
 
 export async function PUT(request, { params }) {
-  const { type, amount } = await request.json();
+  const body = await readJsonObject(request);
+  if (!body) {
+    return Response.json(
+      { message: "Bad Request.", error: { body: "INVALID_JSON_OBJECT" } },
+      { status: 400 }
+    );
+  }
+
+  const { type, amount } = body;
 
   const { couponId } = await params;
 
@@ -35,13 +44,6 @@ export async function PUT(request, { params }) {
   coupons.splice(couponIndex, 1, { ...coupon, type, amount });
 
   return Response.json({ message: `Update Success.` }, { status: 200 });
-}
-
-export async function PATCH(request, { params }) {
-  const { couponId } = await params;
-
-  const res = await request.json();
-  return Response.json({ res });
 }
 
 export async function DELETE({ params }) {

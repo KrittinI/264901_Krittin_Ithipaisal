@@ -1,5 +1,6 @@
 import { allocateCouponId, COUPON_TYPE, coupons } from "../../../../constants";
 import { validateCoupon } from "../../../../validators";
+import { readJsonObject } from "../_utils/request";
 
 export async function GET(request) {
   const searchParams = request.nextUrl.searchParams;
@@ -19,7 +20,15 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
-  const { type, amount } = await request.json();
+  const body = await readJsonObject(request);
+  if (!body) {
+    return Response.json(
+      { message: "Bad Request.", error: { body: "INVALID_JSON_OBJECT" } },
+      { status: 400 }
+    );
+  }
+
+  const { type, amount } = body;
 
   const error = validateCoupon({ type, amount });
 

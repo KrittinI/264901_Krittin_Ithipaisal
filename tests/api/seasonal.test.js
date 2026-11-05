@@ -4,9 +4,19 @@ import test from "node:test";
 import { seasonals } from "../../constants/index.js";
 import * as seasonalRoute from "../../src/app/api/seasonal/route.js";
 import * as seasonalItemRoute from "../../src/app/api/seasonal/[seasonalId]/route.js";
-import { makeRequest, responseBody } from "./helpers.js";
+import { makeMalformedJsonRequest, makeRequest, responseBody } from "./helpers.js";
 
 test("seasonal routes validate input and return the created campaign ID", async () => {
+  const malformedResponse = await seasonalRoute.POST(
+    makeMalformedJsonRequest("http://localhost/api/seasonal")
+  );
+  assert.equal(malformedResponse.status, 400);
+
+  const nullBodyResponse = await seasonalRoute.POST(
+    makeRequest("http://localhost/api/seasonal", { method: "POST", body: null })
+  );
+  assert.equal(nullBodyResponse.status, 400);
+
   const response = await seasonalRoute.POST(
     makeRequest("http://localhost/api/seasonal", {
       method: "POST",
@@ -56,6 +66,12 @@ test("seasonal routes validate input and return the created campaign ID", async 
     every: 200,
     discount: 20,
   });
+
+  const malformedUpdateResponse = await seasonalItemRoute.PUT(
+    makeMalformedJsonRequest("http://localhost", "PUT"),
+    { params: Promise.resolve({ seasonalId: body.id }) }
+  );
+  assert.equal(malformedUpdateResponse.status, 400);
 
   const deleteResponse = await seasonalItemRoute.DELETE({
     params: Promise.resolve({ seasonalId: body.id }),

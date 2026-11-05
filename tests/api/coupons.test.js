@@ -4,9 +4,19 @@ import test from "node:test";
 import { coupons } from "../../constants/index.js";
 import * as couponRoute from "../../src/app/api/coupons/route.js";
 import * as couponItemRoute from "../../src/app/api/coupons/[couponId]/route.js";
-import { makeRequest, responseBody } from "./helpers.js";
+import { makeMalformedJsonRequest, makeRequest, responseBody } from "./helpers.js";
 
 test("coupon routes validate input and return the created coupon ID", async () => {
+  const malformedResponse = await couponRoute.POST(
+    makeMalformedJsonRequest("http://localhost/api/coupons")
+  );
+  assert.equal(malformedResponse.status, 400);
+
+  const nullBodyResponse = await couponRoute.POST(
+    makeRequest("http://localhost/api/coupons", { method: "POST", body: null })
+  );
+  assert.equal(nullBodyResponse.status, 400);
+
   const response = await couponRoute.POST(
     makeRequest("http://localhost/api/coupons", {
       method: "POST",
@@ -63,6 +73,12 @@ test("coupon routes validate input and return the created coupon ID", async () =
     type: "percentage",
     amount: 20,
   });
+
+  const malformedUpdateResponse = await couponItemRoute.PUT(
+    makeMalformedJsonRequest("http://localhost", "PUT"),
+    { params: Promise.resolve({ couponId: body.id }) }
+  );
+  assert.equal(malformedUpdateResponse.status, 400);
 
   const deleteResponse = await couponItemRoute.DELETE({
     params: Promise.resolve({ couponId: body.id }),

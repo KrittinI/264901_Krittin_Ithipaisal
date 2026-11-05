@@ -4,9 +4,19 @@ import test from "node:test";
 import { ontops } from "../../constants/index.js";
 import * as ontopRoute from "../../src/app/api/ontop/route.js";
 import * as ontopItemRoute from "../../src/app/api/ontop/[ontopId]/route.js";
-import { makeRequest, responseBody } from "./helpers.js";
+import { makeMalformedJsonRequest, makeRequest, responseBody } from "./helpers.js";
 
 test("ontop routes validate input and return the created campaign ID", async () => {
+  const malformedResponse = await ontopRoute.POST(
+    makeMalformedJsonRequest("http://localhost/api/ontop")
+  );
+  assert.equal(malformedResponse.status, 400);
+
+  const nullBodyResponse = await ontopRoute.POST(
+    makeRequest("http://localhost/api/ontop", { method: "POST", body: null })
+  );
+  assert.equal(nullBodyResponse.status, 400);
+
   const response = await ontopRoute.POST(
     makeRequest("http://localhost/api/ontop", {
       method: "POST",
@@ -58,6 +68,12 @@ test("ontop routes validate input and return the created campaign ID", async () 
     type: "accessories",
     amount: 15,
   });
+
+  const malformedUpdateResponse = await ontopItemRoute.PUT(
+    makeMalformedJsonRequest("http://localhost", "PUT"),
+    { params: Promise.resolve({ ontopId: body.id }) }
+  );
+  assert.equal(malformedUpdateResponse.status, 400);
 
   const deleteResponse = await ontopItemRoute.DELETE({
     params: Promise.resolve({ ontopId: body.id }),

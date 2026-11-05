@@ -42,7 +42,7 @@ items added to the shopping cart. The campaigns are as listed below:
 
 ### Numeric Input Validation
 
-For Coupon, On-top, and Seasonal create/update requests, numeric fields must be JSON numbers and finite values. Numeric strings such as `"10"` and `null` are rejected. Existing range rules also apply: coupon amounts and non-points On-top amounts cannot be negative; percentage values must be below 100; and Seasonal discounts cannot be negative or greater than or equal to `every`.
+For Coupon, On-top, and Seasonal create/update requests, the body must be a valid JSON object. Malformed JSON, `null`, arrays, and primitive JSON values are rejected with `400 Bad Request`. Numeric fields must be JSON numbers and finite values; numeric strings such as `"10"` are rejected. Existing range rules also apply: coupon amounts and non-points On-top amounts cannot be negative; percentage values must be below 100; and Seasonal discounts cannot be negative or greater than or equal to `every`.
 
 ## Table of Contents
 
@@ -114,69 +114,6 @@ Create a new order and calculate applicable discounts.
 
 ---
 
-## PATCH `/orders/:orderId`
-
-Update specific fields of an existing order.
-
-### Path Parameter
-
-| Field     | Type   | Required | Description |
-| --------- | ------ | -------- | ----------- |
-| `orderId` | Number | Yes      | Order ID    |
-
-### Request Body
-
-```json
-{
-  "orders": [
-    {
-      "id": 1,
-      "amount": 2
-    }
-  ],
-  "coupon": "1"
-}
-```
-
-### Field Description
-
-| Field             | Type   | Required | Description          |
-| ----------------- | ------ | -------- | -------------------- |
-| `orders`          | Array  | No       | Updated product list |
-| `orders[].id`     | Number | Yes\*    | Product ID           |
-| `orders[].amount` | Number | Yes\*    | Product quantity     |
-| `coupon`          | String | No       | Coupon ID            |
-| `onTop`           | String | No       | On-top campaign ID   |
-| `seasonal`        | String | No       | Seasonal campaign ID |
-
-_Required when an item is included in the `orders` array._
-
-### Validation Rules
-
-- At least one field must be provided.
-- Product quantity must be greater than 0.
-- Referenced campaigns must exist.
-- Percentage discount must not exceed 100%.
-- Order subtotal, discounts, and total must be recalculated after updating.
-
-### Example Response — 200 OK
-
-```json
-{
-  "orderId": 1,
-  "subtotal": 700,
-  "discount": {
-    "coupon": 100,
-    "onTop": 50,
-    "seasonal": 10
-  },
-  "totalDiscount": 160,
-  "total": 540
-}
-```
-
----
-
 # Coupons
 
 ## POST `/coupons`
@@ -235,50 +172,6 @@ Update an existing coupon.
   "amount": 20
 }
 ```
-
-### Example Response — 200 OK
-
-```json
-{
-  "id": 1,
-  "type": "percentage",
-  "amount": 20
-}
-```
-
----
-
-## PATCH `/coupons/:couponId`
-
-Update specific fields of an existing coupon.
-
-### Path Parameter
-
-| Field      | Type   | Required | Description |
-| ---------- | ------ | -------- | ----------- |
-| `couponId` | Number | Yes      | Coupon ID   |
-
-### Request Body
-
-```json
-{
-  "amount": 20
-}
-```
-
-### Field Description
-
-| Field    | Type   | Required | Description                            |
-| -------- | ------ | -------- | -------------------------------------- |
-| `type`   | String | No       | Discount type: `fixed` or `percentage` |
-| `amount` | Number | No       | Discount amount or percentage          |
-
-### Validation Rules
-
-- At least one field must be provided.
-- `type` must be `fixed` or `percentage`.
-- `amount` must be greater than 0.
-- Percentage discount must not exceed 100%.
 
 ### Example Response — 200 OK
 
@@ -415,50 +308,6 @@ Update an existing On-top campaign.
 
 ---
 
-## PATCH `/ontop/:ontopId`
-
-Update specific fields of an existing On-top campaign.
-
-### Path Parameter
-
-| Field     | Type   | Required | Description        |
-| --------- | ------ | -------- | ------------------ |
-| `ontopId` | Number | Yes      | On-top campaign ID |
-
-### Request Body
-
-```json
-{
-  "amount": 15
-}
-```
-
-### Field Description
-
-| Field    | Type   | Required | Description       |
-| -------- | ------ | -------- | ----------------- |
-| `type`   | String | No       | Campaign category |
-| `amount` | Number | No       | Discount amount   |
-
-### Validation Rules
-
-- At least one field must be provided.
-- `type` must be one of the supported types.
-- `amount` must be greater than 0.
-- Percentage discount must not exceed 100%.
-
-### Example Response — 200 OK
-
-```json
-{
-  "id": 1,
-  "type": "clothing",
-  "amount": 15
-}
-```
-
----
-
 ## GET `/ontop`
 
 Retrieve all On-top campaigns.
@@ -585,50 +434,6 @@ Update an existing Seasonal campaign.
   "id": 1,
   "every": 10,
   "discount": 1
-}
-```
-
----
-
-## PATCH `/seasonal/:seasonalId`
-
-Update specific fields of an existing Seasonal campaign.
-
-### Path Parameter
-
-| Field        | Type   | Required | Description          |
-| ------------ | ------ | -------- | -------------------- |
-| `seasonalId` | Number | Yes      | Seasonal campaign ID |
-
-### Request Body
-
-```json
-{
-  "discount": 2
-}
-```
-
-### Field Description
-
-| Field      | Type   | Required | Description                   |
-| ---------- | ------ | -------- | ----------------------------- |
-| `every`    | Number | No       | Spending threshold            |
-| `discount` | Number | No       | Discount amount per threshold |
-
-### Validation Rules
-
-- At least one field must be provided.
-- `every` must be greater than 0.
-- `discount` must be greater than 0.
-- `discount` must not exceed `every`.
-
-### Example Response — 200 OK
-
-```json
-{
-  "id": 1,
-  "every": 10,
-  "discount": 2
 }
 ```
 
@@ -832,22 +637,18 @@ items added to the shopping cart. The campaigns are as listed below:
 ## Implementation Checklist
 
 - [ ] POST `/orders`
-- [ ] PATCH `/orders/:orderId`
 - [x] POST `/coupons`
 - [x] PUT `/coupons/:couponId`
-<!-- - [ ] PATCH `/coupons/:couponId` -->
 - [x] GET `/coupons`
 - [x] GET `/coupons/:couponId`
 - [x] DELETE `/coupons/:couponId`
 - [x] POST `/ontop`
 - [x] PUT `/ontop/:ontopId`
-<!-- - [ ] PATCH `/ontop/:ontopId` -->
 - [x] GET `/ontop`
 - [x] GET `/ontop/:ontopId`
 - [x] DELETE `/ontop/:ontopId`
 - [x] POST `/seasonal`
 - [x] PUT `/seasonal/:seasonalId`
-<!-- - [ ] PATCH `/seasonal/:seasonalId` -->
 - [x] GET `/seasonal`
 - [x] GET `/seasonal/:seasonalId`
 - [x] DELETE `/seasonal/:seasonalId`
@@ -935,90 +736,6 @@ Create a new order and calculate applicable discounts.
 
 ---
 
-## PATCH `/orders/:orderId`
-
-Update specific fields of an existing order.
-
-### Path Parameter
-
-| Field | Type | Required | Description |
-
-| --------- | ------ | -------- | ----------- |
-
-| `orderId` | String | Yes | Order ID |
-
-### Request Body
-
-```json
-{
-  "orders": [
-    {
-      "id": "1",
-
-      "amount": 2
-    }
-  ],
-
-  "coupon": "1"
-}
-```
-
-### Field Description
-
-| Field | Type | Required | Description |
-
-| ----------------- | ------ | -------- | -------------------- |
-
-| `orders` | Array | No | Updated product list |
-
-| `orders[].id` | String | Yes\\\* | Product ID |
-
-| `orders[].amount` | Number | Yes\\\* | Product quantity |
-
-| `coupon` | String | No | Coupon ID |
-
-| `onTop` | String | No | On-top campaign ID |
-
-| `seasonal` | String | No | Seasonal campaign ID |
-
-\_\_Required when an item is included in the `orders` array.\_\_
-
-### Validation Rules
-
-- At least one field must be provided.
-
-- Product quantity must be greater than 0.
-
-- Referenced campaigns must exist.
-
-- Percentage discount must not exceed 100%.
-
-- Order subtotal, discounts, and total must be recalculated after updating.
-
-### Example Response — 200 OK
-
-```json
-{
-  "orderId": "1",
-
-  "subtotal": 700,
-
-  "discount": {
-    "coupon": 100,
-
-    "onTop": 50,
-
-    "seasonal": 10
-  },
-
-  "totalDiscount": 160,
-
-  "total": 540
-}
-```
-
----
-
 # Coupons
 
 ## POST `/coupons`
@@ -1088,60 +805,6 @@ Update an existing coupon.
   "amount": 20
 }
 ```
-
-### Example Response — 200 OK
-
-```json
-{
-  "id": "1",
-
-  "type": "percentage",
-
-  "amount": 20
-}
-```
-
----
-
-## PATCH `/coupons/:couponId`
-
-Update specific fields of an existing coupon.
-
-### Path Parameter
-
-| Field | Type | Required | Description |
-
-| ---------- | ------ | -------- | ----------- |
-
-| `couponId` | String | Yes | Coupon ID |
-
-### Request Body
-
-```json
-{
-  "amount": 20
-}
-```
-
-### Field Description
-
-| Field | Type | Required | Description |
-
-| -------- | ------ | -------- | -------------------------------------- |
-
-| `type` | String | No | Discount type: `fixed` or `percentage` |
-
-| `amount` | Number | No | Discount amount or percentage |
-
-### Validation Rules
-
-- At least one field must be provided.
-
-- `type` must be `fixed` or `percentage`.
-
-- `amount` must be greater than 0.
-
-- Percentage discount must not exceed 100%.
 
 ### Example Response — 200 OK
 
@@ -1294,60 +957,6 @@ Update an existing On-top campaign.
   "id": "1",
 
   "type": "accessories",
-
-  "amount": 15
-}
-```
-
----
-
-## PATCH `/ontop/:ontopId`
-
-Update specific fields of an existing On-top campaign.
-
-### Path Parameter
-
-| Field | Type | Required | Description |
-
-| --------- | ------ | -------- | ------------------ |
-
-| `ontopId` | String | Yes | On-top campaign ID |
-
-### Request Body
-
-```json
-{
-  "amount": 15
-}
-```
-
-### Field Description
-
-| Field | Type | Required | Description |
-
-| -------- | ------ | -------- | ----------------- |
-
-| `type` | String | No | Campaign category |
-
-| `amount` | Number | No | Discount amount |
-
-### Validation Rules
-
-- At least one field must be provided.
-
-- `type` must be one of the supported types.
-
-- `amount` must be greater than 0.
-
-- Percentage discount must not exceed 100%.
-
-### Example Response — 200 OK
-
-```json
-{
-  "id": "1",
-
-  "type": "clothing",
 
   "amount": 15
 }
@@ -1544,60 +1153,6 @@ Update an existing Seasonal campaign.
   "every": 10,
 
   "discount": 1
-}
-```
-
----
-
-## PATCH `/seasonal/:seasonalId`
-
-Update specific fields of an existing Seasonal campaign.
-
-### Path Parameter
-
-| Field | Type | Required | Description |
-
-| ------------ | ------ | -------- | -------------------- |
-
-| `seasonalId` | String | Yes | Seasonal campaign ID |
-
-### Request Body
-
-```json
-{
-  "discount": 2
-}
-```
-
-### Field Description
-
-| Field | Type | Required | Description |
-
-| ---------- | ------ | -------- | ----------------------------- |
-
-| `every` | Number | No | Spending threshold |
-
-| `discount` | Number | No | Discount amount per threshold |
-
-### Validation Rules
-
-- At least one field must be provided.
-
-- `every` must be greater than 0.
-
-- `discount` must be greater than 0.
-
-- `discount` must not exceed `every`.
-
-### Example Response — 200 OK
-
-```json
-{
-  "id": "1",
-
-  "every": 10,
-
-  "discount": 2
 }
 ```
 
