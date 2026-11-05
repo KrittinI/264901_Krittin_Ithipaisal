@@ -1,4 +1,5 @@
 import { COUPON_TYPE, coupons } from "../../../../constants";
+import { validateCoupon } from "../../../../validators";
 
 export async function GET(request) {
   const searchParams = request.nextUrl.searchParams;
@@ -20,21 +21,9 @@ export async function GET(request) {
 export async function POST(request) {
   const { type, amount } = await request.json();
 
-  let error = {};
+  const error = validateCoupon({ type, amount });
 
-  if (!COUPON_TYPE[type]) {
-    error.type = "INVALID_TYPE";
-  }
-
-  if (isNaN(amount) || amount < 0) {
-    error.amount = "INVALID_AMOUNT";
-  }
-
-  if (type === COUPON_TYPE.percentage && !isNaN(amount) && amount >= 100) {
-    error.amount = "INVALID_AMOUNT";
-  }
-
-  if (Object.keys(error).length) {
+  if (error) {
     return Response.json({ message: `Bad Request.`, error }, { status: 400 });
   }
 
