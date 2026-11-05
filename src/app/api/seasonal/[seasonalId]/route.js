@@ -1,4 +1,5 @@
 import { seasonals } from "../../../../../constants";
+import { validateSeasonal } from "../../../../../validators";
 
 export async function GET(request, { params }) {
   const { seasonalId } = await params;
@@ -27,17 +28,9 @@ export async function PUT(request, { params }) {
     return Response.json({ message: `Seasonal Not Found.` }, { status: 404 });
   }
 
-  let error = {};
+  const error = validateSeasonal({ every, discount });
 
-  if (isNaN(every) || every < 0) {
-    error.every = "INVALID_EVERY";
-  }
-
-  if (isNaN(discount) || discount < 0 || Number(discount) >= Number(every)) {
-    error.discount = "INVALID_DISCOUNT";
-  }
-
-  if (Object.keys(error).length) {
+  if (error) {
     return Response.json({ message: `Bad Request.`, error }, { status: 400 });
   }
 
