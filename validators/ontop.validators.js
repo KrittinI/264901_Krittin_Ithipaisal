@@ -1,7 +1,7 @@
 import { ONTOP_TYPE } from "../constants";
 
 export function validateOntop({ amount, type }) {
-  let error = {};
+  const error = {};
 
   if (!ONTOP_TYPE[type]) {
     error.type = "INVALID_TYPE";
