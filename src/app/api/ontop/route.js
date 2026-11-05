@@ -1,4 +1,5 @@
 import { ONTOP_TYPE, ontops } from "../../../../constants";
+import { validateOntop } from "../../../../validators";
 
 export async function GET(request) {
   const searchParams = request.nextUrl.searchParams;
@@ -20,21 +21,9 @@ export async function GET(request) {
 export async function POST(request) {
   let { type, amount } = await request.json();
 
-  let error = {};
+  const error = validateOntop({ amount, type });
 
-  if (!ONTOP_TYPE[type]) {
-    error.type = "INVALID_TYPE";
-  }
-
-  if (type !== ONTOP_TYPE.points) {
-    if (isNaN(amount) || amount < 0 || amount >= 100) {
-      error.amount = "INVALID_AMOUNT";
-    }
-  } else {
-    amount = 20;
-  }
-
-  if (Object.keys(error).length) {
+  if (error) {
     return Response.json({ message: `Bad Request.`, error }, { status: 400 });
   }
 
