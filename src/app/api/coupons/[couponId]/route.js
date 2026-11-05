@@ -1,4 +1,5 @@
-import { COUPON_TYPE, coupons } from "../../../../../constants";
+import { coupons } from "../../../../../constants";
+import { validateCoupon } from "../../../../../validators";
 
 export async function GET(request, { params }) {
   const { couponId } = await params;
@@ -23,21 +24,9 @@ export async function PUT(request, { params }) {
     return Response.json({ message: `Coupon Not Found.` }, { status: 404 });
   }
 
-  let error = {};
+  const error = validateCoupon({ type, amount });
 
-  if (!COUPON_TYPE[type]) {
-    error.type = "INVALID_TYPE";
-  }
-
-  if (isNaN(amount) || amount < 0) {
-    error.amount = "INVALID_AMOUNT";
-  }
-
-  if (type === COUPON_TYPE.percentage && !isNaN(amount) && amount >= 100) {
-    error.amount = "INVALID_AMOUNT";
-  }
-
-  if (Object.keys(error).length) {
+  if (error) {
     return Response.json({ message: `Bad Request.`, error }, { status: 400 });
   }
 

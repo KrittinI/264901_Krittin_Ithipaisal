@@ -1,4 +1,5 @@
-import { ONTOP_TYPE, ontops } from "../../../../../constants";
+import { ontops } from "../../../../../constants";
+import { validateOntop } from "../../../../../validators";
 
 export async function GET(request, { params }) {
   const { ontopId } = await params;
@@ -22,21 +23,9 @@ export async function PUT(request, { params }) {
     return Response.json({ message: `Ontop Not Found.` }, { status: 404 });
   }
 
-  let error = {};
+  const error = validateOntop({ amount, type });
 
-  if (!ONTOP_TYPE[type]) {
-    error.type = "INVALID_TYPE";
-  }
-
-  if (type !== ONTOP_TYPE.points) {
-    if (isNaN(amount) || amount < 0 || amount >= 100) {
-      error.amount = "INVALID_AMOUNT";
-    }
-  } else {
-    amount = 20;
-  }
-
-  if (Object.keys(error).length) {
+  if (error) {
     return Response.json({ message: `Bad Request.`, error }, { status: 400 });
   }
 
