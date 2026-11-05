@@ -1,7 +1,15 @@
-Before start project
+# Playtorium Discount API
 
-npm i
+## Getting Started
+
+Install dependencies and start the Next.js development server with npm:
+
+```bash
+npm install
 npm run dev
+```
+
+The app runs at [http://localhost:3003](http://localhost:3003). Run the linter with `npm run lint`.
 
 ## Assignment #1
 
@@ -31,6 +39,10 @@ items added to the shopping cart. The campaigns are as listed below:
 ### In order assumptions for applying order to discion
 
 # API Specification — Discount Campaign
+
+### Numeric Input Validation
+
+For Coupon, On-top, and Seasonal create/update requests, numeric fields must be JSON numbers and finite values. Numeric strings such as `"10"` and `null` are rejected. Existing range rules also apply: coupon amounts and non-points On-top amounts cannot be negative; percentage values must be below 100; and Seasonal discounts cannot be negative or greater than or equal to `every`.
 
 ## Table of Contents
 

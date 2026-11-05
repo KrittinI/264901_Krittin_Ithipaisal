@@ -16,7 +16,7 @@ export async function GET(request, { params }) {
 }
 
 export async function PUT(request, { params }) {
-  const { type, amount } = await request.json();
+  const { every, discount } = await request.json();
 
   const { seasonalId } = await params;
 

@@ -15,3 +15,9 @@ export const seasonals = [
     discount: "15",
   },
 ];
+
+let nextSeasonalId = Math.max(-1, ...seasonals.map(({ id }) => Number(id))) + 1;
+
+export function allocateSeasonalId() {
+  return String(nextSeasonalId++);
+}

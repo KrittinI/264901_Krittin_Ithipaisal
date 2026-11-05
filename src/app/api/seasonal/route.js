@@ -1,4 +1,4 @@
-import { seasonals } from "../../../../constants";
+import { allocateSeasonalId, seasonals } from "../../../../constants";
 import { validateSeasonal } from "../../../../validators";
 
 export async function GET(request) {
@@ -14,7 +14,8 @@ export async function POST(request) {
     return Response.json({ message: `Bad Request.`, error }, { status: 400 });
   }
 
-  const id = seasonals.push({ id: String(seasonals.length), every, discount });
+  const id = allocateSeasonalId();
+  seasonals.push({ id, every, discount });
 
   return Response.json(
     { message: "Create seasonal success.", id },

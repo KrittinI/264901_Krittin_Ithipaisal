@@ -21,6 +21,12 @@ export let ontops = [
   },
 ];
 
+let nextOntopId = Math.max(-1, ...ontops.map(({ id }) => Number(id))) + 1;
+
+export function allocateOntopId() {
+  return String(nextOntopId++);
+}
+
 export const ONTOP_TYPE = {
   clothing: "clothing",
   accessories: "accessories",

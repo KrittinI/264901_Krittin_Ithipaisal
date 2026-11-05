@@ -41,6 +41,12 @@ export let coupons = [
   },
 ];
 
+let nextCouponId = Math.max(-1, ...coupons.map(({ id }) => Number(id))) + 1;
+
+export function allocateCouponId() {
+  return String(nextCouponId++);
+}
+
 export const COUPON_TYPE = {
   fixed: "fixed",
   percentage: "percentage",

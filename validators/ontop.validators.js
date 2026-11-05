@@ -8,7 +8,12 @@ export function validateOntop({ amount, type }) {
   }
 
   if (type !== ONTOP_TYPE.points) {
-    if (isNaN(amount) || amount < 0 || amount >= 100) {
+    if (
+      typeof amount !== "number" ||
+      !Number.isFinite(amount) ||
+      amount < 0 ||
+      amount >= 100
+    ) {
       error.amount = "INVALID_AMOUNT";
     }
   } else {
