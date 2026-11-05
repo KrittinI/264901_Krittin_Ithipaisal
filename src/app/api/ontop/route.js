@@ -1,4 +1,4 @@
-import { ONTOP_TYPE, ontops } from "../../../../constants/ontops";
+import { ONTOP_TYPE, ontops } from "../../../../constants";
 
 export async function GET(request) {
   const searchParams = request.nextUrl.searchParams;

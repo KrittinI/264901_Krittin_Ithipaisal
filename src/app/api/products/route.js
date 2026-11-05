@@ -1,4 +1,4 @@
-import { PRODUCT_CATEGORY, products } from "../../../../constants/products";
+import { PRODUCT_CATEGORY, products } from "../../../../constants";
 
 export async function GET(request) {
   const searchParams = request.nextUrl.searchParams;

@@ -1,4 +1,4 @@
-import { COUPON_TYPE, coupons } from "../../../../constants/coupons";
+import { COUPON_TYPE, coupons } from "../../../../constants";
 
 export async function GET(request) {
   const searchParams = request.nextUrl.searchParams;

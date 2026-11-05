@@ -1,4 +1,4 @@
-import { seasonals } from "../../../../constants/seasonal";
+import { seasonals } from "../../../../constants";
 
 export async function GET(request) {
   return Response.json({ seasonals });
