@@ -1,3 +1,8 @@
+Before start project
+
+npm i
+npm run dev
+
 ## Assignment #1
 
 The discount module is to calculate the final price of an order by applying multiple discount campaigns to
@@ -798,22 +803,25 @@ items added to the shopping cart. The campaigns are as listed below:
 
 - [ ] POST `/orders`
 - [ ] PATCH `/orders/:orderId`
-- [ ] POST `/coupons`
-- [ ] PUT `/coupons/:couponId`
-- [ ] PATCH `/coupons/:couponId`
-- [ ] GET `/coupons`
-- [ ] DELETE `/coupons/:couponId`
-- [ ] POST `/ontop`
-- [ ] PUT `/ontop/:ontopId`
-- [ ] PATCH `/ontop/:ontopId`
-- [ ] GET `/ontop`
-- [ ] DELETE `/ontop/:ontopId`
-- [ ] POST `/seasonal`
-- [ ] PUT `/seasonal/:seasonalId`
-- [ ] PATCH `/seasonal/:seasonalId`
-- [ ] GET `/seasonal`
-- [ ] DELETE `/seasonal/:seasonalId`
-- [ ] GET `/products`
+- [x] POST `/coupons`
+- [x] PUT `/coupons/:couponId`
+<!-- - [ ] PATCH `/coupons/:couponId` -->
+- [x] GET `/coupons`
+- [x] GET `/coupons/:couponId`
+- [x] DELETE `/coupons/:couponId`
+- [x] POST `/ontop`
+- [x] PUT `/ontop/:ontopId`
+<!-- - [ ] PATCH `/ontop/:ontopId` -->
+- [x] GET `/ontop`
+- [x] GET `/ontop/:ontopId`
+- [x] DELETE `/ontop/:ontopId`
+- [x] POST `/seasonal`
+- [x] PUT `/seasonal/:seasonalId`
+<!-- - [ ] PATCH `/seasonal/:seasonalId` -->
+- [x] GET `/seasonal`
+- [x] GET `/seasonal/:seasonalId`
+- [x] DELETE `/seasonal/:seasonalId`
+- [x] GET `/products`
 
 ---
 
@@ -943,7 +951,7 @@ Update specific fields of an existing order.
 
 | `seasonal` | String | No | Seasonal campaign ID |
 
-_\_Required when an item is included in the `orders` array.\__
+\_\_Required when an item is included in the `orders` array.\_\_
 
 ### Validation Rules
 
