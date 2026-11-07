@@ -1,4 +1,5 @@
 import { orders } from "../../../../../constants";
+import { readJsonObject } from "../../_utils/request";
 
 export async function GET(request, { params }) {
   const { orderId } = await params;
@@ -15,6 +16,16 @@ export async function GET(request, { params }) {
 export async function PUT(request, { params }) {
   const { orderId } = await params;
 
-  const res = await request.json();
+  const body = await readJsonObject(request);
+
+  if (!body) {
+    return Response.json(
+      { message: "Bad Request.", error: { body: "INVALID_JSON_OBJECT" } },
+      { status: 400 }
+    );
+  }
+
+  const { coupon, ontop, seasonal } = body;
+
   return Response.json({ res });
 }
