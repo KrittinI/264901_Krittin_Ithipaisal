@@ -1,6 +1,15 @@
+import { orders } from "../../../../../constants";
+
 export async function GET(request, { params }) {
   const { orderId } = await params;
-  return Response.json({ orderId });
+
+  const orderIndex = orders.findIndex((order) => order.id === orderId);
+
+  if (orderIndex === -1) {
+    return Response.json({ message: `Order Not Found.` }, { status: 404 });
+  }
+
+  return Response.json({ order: orders[orderIndex] });
 }
 
 export async function PUT(request, { params }) {
