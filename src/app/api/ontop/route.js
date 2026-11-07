@@ -7,7 +7,7 @@ export async function GET(request) {
   const type = searchParams.get("type");
 
   if (!type) {
-    return Response.json({ ontops }, { status: 200 });
+    return Response.json({ ontops: Array.from(ontops.values()) }, { status: 200 });
   }
 
   if (!Object.hasOwn(ONTOP_TYPE, type)) {
@@ -15,7 +15,7 @@ export async function GET(request) {
   }
 
   return Response.json({
-    ontops: ontops.filter((ontop) => ontop.type === type),
+    ontops: Array.from(ontops.values()).filter((ontop) => ontop.type === type),
   });
 }
 
@@ -37,7 +37,7 @@ export async function POST(request) {
   }
 
   const id = allocateOntopId();
-  ontops.push({ id, type, amount });
+  ontops.set(id, { id, type, amount });
 
   return Response.json(
     { message: "Create ontop success.", id },

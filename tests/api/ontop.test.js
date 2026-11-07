@@ -24,7 +24,7 @@ test("ontop routes validate input and return the created campaign ID", async () 
     })
   );
   const body = await responseBody(response);
-  const storedOntop = ontops.find((ontop) => ontop.id === body.id);
+  const storedOntop = ontops.get(body.id);
 
   assert.equal(response.status, 201);
   assert.ok(storedOntop);
@@ -63,7 +63,7 @@ test("ontop routes validate input and return the created campaign ID", async () 
     { params: Promise.resolve({ ontopId: body.id }) }
   );
   assert.equal(updateResponse.status, 200);
-  assert.deepEqual(ontops.find((ontop) => ontop.id === body.id), {
+  assert.deepEqual(ontops.get(body.id), {
     id: body.id,
     type: "accessories",
     amount: 15,
@@ -79,5 +79,5 @@ test("ontop routes validate input and return the created campaign ID", async () 
     params: Promise.resolve({ ontopId: body.id }),
   });
   assert.equal(deleteResponse.status, 200);
-  assert.equal(ontops.some((ontop) => ontop.id === body.id), false);
+  assert.equal(ontops.has(body.id), false);
 });

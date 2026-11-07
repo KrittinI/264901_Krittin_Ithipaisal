@@ -1,4 +1,4 @@
-export let ontops = [
+const initialOntops = [
   {
     id: "0",
     type: "clothing",
@@ -21,7 +21,9 @@ export let ontops = [
   },
 ];
 
-let nextOntopId = Math.max(-1, ...ontops.map(({ id }) => Number(id))) + 1;
+export const ontops = new Map(initialOntops.map((ontop) => [ontop.id, ontop]));
+
+let nextOntopId = Math.max(-1, ...Array.from(ontops.keys(), Number)) + 1;
 
 export function allocateOntopId() {
   return String(nextOntopId++);
