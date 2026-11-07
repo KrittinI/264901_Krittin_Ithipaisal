@@ -1,4 +1,4 @@
-export const seasonals = [
+const initialSeasonals = [
   {
     id: "0",
     every: "20",
@@ -16,7 +16,11 @@ export const seasonals = [
   },
 ];
 
-let nextSeasonalId = Math.max(-1, ...seasonals.map(({ id }) => Number(id))) + 1;
+export const seasonals = new Map(
+  initialSeasonals.map((seasonal) => [seasonal.id, seasonal])
+);
+
+let nextSeasonalId = Math.max(-1, ...Array.from(seasonals.keys(), Number)) + 1;
 
 export function allocateSeasonalId() {
   return String(nextSeasonalId++);

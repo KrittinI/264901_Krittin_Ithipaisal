@@ -5,15 +5,13 @@ import { readJsonObject } from "../../_utils/request";
 export async function GET(request, { params }) {
   const { seasonalId } = await params;
 
-  const seasonalIndex = seasonals.findIndex(
-    (seasonal) => seasonal.id === seasonalId
-  );
+  const seasonal = seasonals.get(seasonalId);
 
-  if (seasonalIndex === -1) {
+  if (!seasonal) {
     return Response.json({ message: `Seasonal Not Found.` }, { status: 404 });
   }
 
-  return Response.json({ seasonal: seasonals[seasonalIndex] });
+  return Response.json({ seasonal });
 }
 
 export async function PUT(request, { params }) {
@@ -29,11 +27,9 @@ export async function PUT(request, { params }) {
 
   const { seasonalId } = await params;
 
-  const seasonalIndex = seasonals.findIndex(
-    (seasonal) => seasonal.id === seasonalId
-  );
+  const seasonal = seasonals.get(seasonalId);
 
-  if (seasonalIndex === -1) {
+  if (!seasonal) {
     return Response.json({ message: `Seasonal Not Found.` }, { status: 404 });
   }
 
@@ -43,9 +39,7 @@ export async function PUT(request, { params }) {
     return Response.json({ message: `Bad Request.`, error }, { status: 400 });
   }
 
-  const seasonal = seasonals[seasonalIndex];
-
-  seasonals.splice(seasonalIndex, 1, { ...seasonal, every, discount });
+  seasonals.set(seasonalId, { ...seasonal, every, discount });
 
   return Response.json({ message: `Update Success.` }, { status: 200 });
 }
@@ -53,15 +47,11 @@ export async function PUT(request, { params }) {
 export async function DELETE({ params }) {
   const { seasonalId } = await params;
 
-  const seasonalIndex = seasonals.findIndex(
-    (seasonal) => seasonal.id === seasonalId
-  );
-
-  if (seasonalIndex === -1) {
+  if (!seasonals.has(seasonalId)) {
     return Response.json({ message: `Seasonal Not Found.` }, { status: 404 });
   }
 
-  seasonals.splice(seasonalIndex, 1);
+  seasonals.delete(seasonalId);
 
   return Response.json({ message: `Delete Success.` });
 }

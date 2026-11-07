@@ -24,7 +24,7 @@ test("seasonal routes validate input and return the created campaign ID", async 
     })
   );
   const body = await responseBody(response);
-  const storedSeasonal = seasonals.find((seasonal) => seasonal.id === body.id);
+  const storedSeasonal = seasonals.get(body.id);
 
   assert.equal(response.status, 201);
   assert.ok(storedSeasonal);
@@ -61,7 +61,7 @@ test("seasonal routes validate input and return the created campaign ID", async 
     { params: Promise.resolve({ seasonalId: body.id }) }
   );
   assert.equal(updateResponse.status, 200);
-  assert.deepEqual(seasonals.find((seasonal) => seasonal.id === body.id), {
+  assert.deepEqual(seasonals.get(body.id), {
     id: body.id,
     every: 200,
     discount: 20,
@@ -77,5 +77,5 @@ test("seasonal routes validate input and return the created campaign ID", async 
     params: Promise.resolve({ seasonalId: body.id }),
   });
   assert.equal(deleteResponse.status, 200);
-  assert.equal(seasonals.some((seasonal) => seasonal.id === body.id), false);
+  assert.equal(seasonals.has(body.id), false);
 });
