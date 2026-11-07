@@ -59,3 +59,63 @@ test("POST /api/orders rejects invalid product references and request shapes", a
   );
   assert.equal(malformedResponse.status, 400);
 });
+
+test("GET /api/orders calculates campaign discounts from query parameters", async () => {
+  const order = {
+    id: "discount-order",
+    products: [{ ...products.get("1"), amount: 2 }],
+  };
+  orders.set(order.id, order);
+
+  try {
+    const response = await ordersRoute.GET(
+      makeRequest(
+        "http://localhost/api/orders?orderId=discount-order&couponId=0&ontopId=3&ontopPoints=200&seasonalId=0"
+      )
+    );
+    const body = await responseBody(response);
+
+    assert.equal(response.status, 200);
+    assert.deepEqual(body, {
+      order,
+      subtotal: 700,
+      discount: { coupon: 20, onTop: 136, seasonal: 27 },
+      totalDiscount: 183,
+      total: 517,
+    });
+
+    const pointsWithoutTypeResponse = await ordersRoute.GET(
+      makeRequest(
+        "http://localhost/api/orders?orderId=discount-order&ontopId=0&ontopPoints=20"
+      )
+    );
+    assert.equal(pointsWithoutTypeResponse.status, 400);
+
+    const missingPointsResponse = await ordersRoute.GET(
+      makeRequest("http://localhost/api/orders?orderId=discount-order&ontopId=3")
+    );
+    assert.equal(missingPointsResponse.status, 400);
+  } finally {
+    orders.delete(order.id);
+  }
+});
+
+test("GET /api/orders requires an order ID and returns 404 for unknown orders", async () => {
+  const missingIdResponse = await ordersRoute.GET(makeRequest("http://localhost/api/orders"));
+  assert.equal(missingIdResponse.status, 400);
+
+  const unknownOrderResponse = await ordersRoute.GET(
+    makeRequest("http://localhost/api/orders?orderId=missing")
+  );
+  assert.equal(unknownOrderResponse.status, 404);
+
+  const invalidQueryResponse = await ordersRoute.GET(
+    makeRequest("http://localhost/api/orders?orderId=missing&couponId2=1")
+  );
+  assert.equal(invalidQueryResponse.status, 400);
+
+  const duplicateQueryResponse = await ordersRoute.GET(
+    makeRequest("http://localhost/api/orders?orderId=missing&couponId=1&couponId=2")
+  );
+  assert.equal(duplicateQueryResponse.status, 400);
+});

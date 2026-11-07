@@ -107,6 +107,53 @@ Create an order by resolving product IDs to catalog products and embedding those
 }
 ```
 
+## GET `/orders`
+
+Retrieve an order and calculate its selected discounts. Campaign discounts are applied in the order Coupon, On-top, then Seasonal.
+
+### Query Parameters
+
+| Parameter | Required | Description |
+| --------- | -------- | ----------- |
+| `orderId` | Yes | Existing order ID |
+| `couponId` | No | Coupon to apply |
+| `ontopId` | No | On-top campaign to apply |
+| `ontopPoints` | Conditional | Required when the selected On-top campaign has type `points` |
+| `seasonalId` | No | Seasonal campaign to apply |
+
+Example: `/orders?orderId=0&couponId=3&ontopId=0&seasonalId=1`.
+
+`ontopPoints` is used only with a points campaign. It must be a non-negative number, and its discount is capped at 20% of the remaining total after the coupon.
+
+### Example Response — 200 OK
+
+```json
+{
+  "order": {
+    "id": "0",
+    "products": [
+      {
+        "id": "1",
+        "name": "T-Shirt",
+        "category": "clothing",
+        "price": 350,
+        "amount": 2
+      }
+    ]
+  },
+  "subtotal": 700,
+  "discount": {
+    "coupon": 0,
+    "onTop": 0,
+    "seasonal": 0
+  },
+  "totalDiscount": 0,
+  "total": 700
+}
+```
+
+Only the listed query parameters are accepted, and each may appear once. For example, `couponId2` or repeated `couponId` keys return `400`. Unknown order or campaign IDs return `404`; invalid query combinations or order products return `400`.
+
 ---
 
 # Coupons
@@ -702,6 +749,53 @@ Create an order by resolving product IDs to catalog products and embedding those
   }
 }
 ```
+
+## GET `/orders`
+
+Retrieve an order and calculate its selected discounts. Campaign discounts are applied in the order Coupon, On-top, then Seasonal.
+
+### Query Parameters
+
+| Parameter | Required | Description |
+| --------- | -------- | ----------- |
+| `orderId` | Yes | Existing order ID |
+| `couponId` | No | Coupon to apply |
+| `ontopId` | No | On-top campaign to apply |
+| `ontopPoints` | Conditional | Required when the selected On-top campaign has type `points` |
+| `seasonalId` | No | Seasonal campaign to apply |
+
+Example: `/orders?orderId=0&couponId=3&ontopId=0&seasonalId=1`.
+
+`ontopPoints` is used only with a points campaign. It must be a non-negative number, and its discount is capped at 20% of the remaining total after the coupon.
+
+### Example Response — 200 OK
+
+```json
+{
+  "order": {
+    "id": "0",
+    "products": [
+      {
+        "id": "1",
+        "name": "T-Shirt",
+        "category": "clothing",
+        "price": 350,
+        "amount": 2
+      }
+    ]
+  },
+  "subtotal": 700,
+  "discount": {
+    "coupon": 0,
+    "onTop": 0,
+    "seasonal": 0
+  },
+  "totalDiscount": 0,
+  "total": 700
+}
+```
+
+Only the listed query parameters are accepted, and each may appear once. For example, `couponId2` or repeated `couponId` keys return `400`. Unknown order or campaign IDs return `404`; invalid query combinations or order products return `400`.
 
 ---
 
