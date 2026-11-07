@@ -24,7 +24,7 @@ test("coupon routes validate input and return the created coupon ID", async () =
     })
   );
   const body = await responseBody(response);
-  const storedCoupon = coupons.find((coupon) => coupon.id === body.id);
+  const storedCoupon = coupons.get(body.id);
 
   assert.equal(response.status, 201);
   assert.ok(storedCoupon);
@@ -68,7 +68,7 @@ test("coupon routes validate input and return the created coupon ID", async () =
     { params: Promise.resolve({ couponId: body.id }) }
   );
   assert.equal(updateResponse.status, 200);
-  assert.deepEqual(coupons.find((coupon) => coupon.id === body.id), {
+  assert.deepEqual(coupons.get(body.id), {
     id: body.id,
     type: "percentage",
     amount: 20,
@@ -84,5 +84,5 @@ test("coupon routes validate input and return the created coupon ID", async () =
     params: Promise.resolve({ couponId: body.id }),
   });
   assert.equal(deleteResponse.status, 200);
-  assert.equal(coupons.some((coupon) => coupon.id === body.id), false);
+  assert.equal(coupons.has(body.id), false);
 });
