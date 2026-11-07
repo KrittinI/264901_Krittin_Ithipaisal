@@ -5,13 +5,13 @@ import { readJsonObject } from "../../_utils/request";
 export async function GET(request, { params }) {
   const { ontopId } = await params;
 
-  const ontopIndex = ontops.findIndex((ontop) => ontop.id === ontopId);
+  const ontop = ontops.get(ontopId);
 
-  if (ontopIndex === -1) {
+  if (!ontop) {
     return Response.json({ message: `Ontop Not Found.` }, { status: 404 });
   }
 
-  return Response.json({ ontop: ontops[ontopIndex] });
+  return Response.json({ ontop });
 }
 
 export async function PUT(request, { params }) {
@@ -26,9 +26,9 @@ export async function PUT(request, { params }) {
   const { type, amount } = body;
   const { ontopId } = await params;
 
-  const ontopIndex = ontops.findIndex((ontop) => ontop.id === ontopId);
+  const ontop = ontops.get(ontopId);
 
-  if (ontopIndex === -1) {
+  if (!ontop) {
     return Response.json({ message: `Ontop Not Found.` }, { status: 404 });
   }
 
@@ -38,9 +38,7 @@ export async function PUT(request, { params }) {
     return Response.json({ message: `Bad Request.`, error }, { status: 400 });
   }
 
-  const ontop = ontops[ontopIndex];
-
-  ontops.splice(ontopIndex, 1, { ...ontop, type, amount });
+  ontops.set(ontopId, { ...ontop, type, amount });
 
   return Response.json({ message: `Update Success.` }, { status: 200 });
 }
@@ -48,13 +46,11 @@ export async function PUT(request, { params }) {
 export async function DELETE({ params }) {
   const { ontopId } = await params;
 
-  const ontopIndex = ontops.findIndex((ontop) => ontop.id === ontopId);
-
-  if (ontopIndex === -1) {
+  if (!ontops.has(ontopId)) {
     return Response.json({ message: `Ontop Not Found.` }, { status: 404 });
   }
 
-  ontops.splice(ontopIndex, 1);
+  ontops.delete(ontopId);
 
   return Response.json({ message: `Delete Success.` });
 }

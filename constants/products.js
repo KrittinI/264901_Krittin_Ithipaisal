@@ -1,4 +1,4 @@
-export const products = [
+const initialProducts = [
   {
     id: "1",
     name: "T-Shirt",
@@ -42,6 +42,10 @@ export const products = [
     price: 1200,
   },
 ];
+
+export const products = new Map(
+  initialProducts.map((product) => [product.id, product])
+);
 
 export const PRODUCT_CATEGORY = {
   clothing: "clothing",

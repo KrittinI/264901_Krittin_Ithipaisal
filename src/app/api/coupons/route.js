@@ -7,7 +7,7 @@ export async function GET(request) {
   const type = searchParams.get("type");
 
   if (!type) {
-    return Response.json({ coupons }, { status: 200 });
+    return Response.json({ coupons: Array.from(coupons.values()) }, { status: 200 });
   }
 
   if (!Object.hasOwn(COUPON_TYPE, type)) {
@@ -15,7 +15,7 @@ export async function GET(request) {
   }
 
   return Response.json({
-    coupons: coupons.filter((coupon) => coupon.type === type),
+    coupons: Array.from(coupons.values()).filter((coupon) => coupon.type === type),
   });
 }
 
@@ -37,7 +37,7 @@ export async function POST(request) {
   }
 
   const id = allocateCouponId();
-  coupons.push({ id, type, amount });
+  coupons.set(id, { id, type, amount });
 
   return Response.json(
     { message: "Create coupon success.", id },

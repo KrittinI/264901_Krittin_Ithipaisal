@@ -3,7 +3,7 @@ import { validateSeasonal } from "../../../../validators";
 import { readJsonObject } from "../_utils/request";
 
 export async function GET(request) {
-  return Response.json({ seasonals });
+  return Response.json({ seasonals: Array.from(seasonals.values()) });
 }
 
 export async function POST(request) {
@@ -24,7 +24,7 @@ export async function POST(request) {
   }
 
   const id = allocateSeasonalId();
-  seasonals.push({ id, every, discount });
+  seasonals.set(id, { id, every, discount });
 
   return Response.json(
     { message: "Create seasonal success.", id },

@@ -33,14 +33,14 @@ export async function POST(request) {
   }
 
   const embeddedProducts = orders.map((order) => {
-    const product = products.find((item) => item.id === String(order.id));
+    const product = products.get(String(order.id));
     return {
       ...product,
       ...(Object.hasOwn(order, "amount") ? { amount: order.amount } : {}),
     };
   });
   const order = { id: allocateOrderId(), products: embeddedProducts };
-  savedOrders.push(order);
+  savedOrders.set(order.id, order);
 
   return Response.json({ order }, { status: 201 });
 }

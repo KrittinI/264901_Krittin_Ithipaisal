@@ -4,13 +4,13 @@ import { readJsonObject } from "../../_utils/request";
 export async function GET(request, { params }) {
   const { orderId } = await params;
 
-  const orderIndex = orders.findIndex((order) => order.id === orderId);
+  const order = orders.get(orderId);
 
-  if (orderIndex === -1) {
+  if (!order) {
     return Response.json({ message: `Order Not Found.` }, { status: 404 });
   }
 
-  return Response.json({ order: orders[orderIndex] });
+  return Response.json({ order });
 }
 
 export async function PUT(request, { params }) {

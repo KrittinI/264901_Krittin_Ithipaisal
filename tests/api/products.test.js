@@ -10,7 +10,7 @@ test("GET /api/products returns products and validates category filters", async 
   const allBody = await responseBody(allResponse);
 
   assert.equal(allResponse.status, 200);
-  assert.deepEqual(allBody.products, products);
+  assert.deepEqual(allBody.products, Array.from(products.values()));
 
   const filteredResponse = await productsRoute.GET(
     makeRequest("http://localhost/api/products?category=accessories")

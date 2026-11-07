@@ -1,6 +1,6 @@
-export let orders = [];
+export const orders = new Map();
 
-let nextOrderId = Math.max(-1, ...orders.map(({ id }) => Number(id))) + 1;
+let nextOrderId = 0;
 
 export function allocateOrderId() {
   return String(nextOrderId++);

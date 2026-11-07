@@ -1,4 +1,4 @@
-export let coupons = [
+const initialCoupons = [
   {
     id: "0",
     type: "fixed",
@@ -41,7 +41,11 @@ export let coupons = [
   },
 ];
 
-let nextCouponId = Math.max(-1, ...coupons.map(({ id }) => Number(id))) + 1;
+export const coupons = new Map(
+  initialCoupons.map((coupon) => [coupon.id, coupon])
+);
+
+let nextCouponId = Math.max(-1, ...Array.from(coupons.keys(), Number)) + 1;
 
 export function allocateCouponId() {
   return String(nextCouponId++);
