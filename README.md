@@ -59,7 +59,7 @@ For Coupon, On-top, and Seasonal create/update requests, the body must be a vali
 
 ## POST `/orders`
 
-Create a new order and calculate applicable discounts.
+Create an order by resolving product IDs to catalog products and embedding those products in the saved order.
 
 ### Request Body
 
@@ -67,48 +67,43 @@ Create a new order and calculate applicable discounts.
 {
   "orders": [
     {
-      "id": 1,
-      "amount": 1
+      "id": "1",
+      "amount": 2
     }
-  ],
-  "coupon": "",
-  "onTop": "",
-  "seasonal": ""
+  ]
 }
 ```
 
 ### Field Description
 
-| Field             | Type   | Required | Description                   |
-| ----------------- | ------ | -------- | ----------------------------- |
-| `orders`          | Array  | Yes      | List of products in the order |
-| `orders[].id`     | Number | Yes      | Product ID                    |
-| `orders[].amount` | Number | Yes      | Product quantity              |
-| `coupon`          | String | No       | Coupon ID                     |
-| `onTop`           | String | No       | On-top campaign ID            |
-| `seasonal`        | String | No       | Seasonal campaign ID          |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `orders` | Array | Yes | Non-empty list of product references |
+| `orders[].id` | String or Number | Yes | Product ID from the catalog |
+| `orders[].amount` | Number | No | Quantity to preserve with the embedded product |
 
 ### Validation Rules
 
-- `orders` must contain at least one product.
-- Product quantity must be greater than 0.
-- Percentage discount must not exceed 100%.
-- Discount amount must not exceed the applicable subtotal.
-- Each campaign type can be applied at most once per order.
+- The request body must contain only the `orders` field.
+- `orders` must be a non-empty array.
+- Every item must reference an existing product ID. If any ID is invalid, the request returns `400 Bad Request`.
 
 ### Example Response — 201 Created
 
 ```json
 {
-  "orderId": 1,
-  "subtotal": 1350,
-  "discount": {
-    "coupon": 100,
-    "onTop": 50,
-    "seasonal": 100
-  },
-  "totalDiscount": 250,
-  "total": 1100
+  "order": {
+    "id": "0",
+    "products": [
+      {
+        "id": "1",
+        "name": "T-Shirt",
+        "category": "clothing",
+        "price": 350,
+        "amount": 2
+      }
+    ]
+  }
 }
 ```
 
@@ -660,7 +655,7 @@ items added to the shopping cart. The campaigns are as listed below:
 
 ## POST `/orders`
 
-Create a new order and calculate applicable discounts.
+Create an order by resolving product IDs to catalog products and embedding those products in the saved order.
 
 ### Request Body
 
@@ -669,68 +664,42 @@ Create a new order and calculate applicable discounts.
   "orders": [
     {
       "id": "1",
-
-      "amount": 1
+      "amount": 2
     }
-  ],
-
-  "coupon": "",
-
-  "onTop": "",
-
-  "seasonal": ""
+  ]
 }
 ```
 
 ### Field Description
 
 | Field | Type | Required | Description |
-
-| ----------------- | ------ | -------- | ----------------------------- |
-
-| `orders` | Array | Yes | List of products in the order |
-
-| `orders[].id` | String | Yes | Product ID |
-
-| `orders[].amount` | Number | Yes | Product quantity |
-
-| `coupon` | String | No | Coupon ID |
-
-| `onTop` | String | No | On-top campaign ID |
-
-| `seasonal` | String | No | Seasonal campaign ID |
+| ----- | ---- | -------- | ----------- |
+| `orders` | Array | Yes | Non-empty list of product references |
+| `orders[].id` | String or Number | Yes | Product ID from the catalog |
+| `orders[].amount` | Number | No | Quantity to preserve with the embedded product |
 
 ### Validation Rules
 
-- `orders` must contain at least one product.
-
-- Product quantity must be greater than 0.
-
-- Percentage discount must not exceed 100%.
-
-- Discount amount must not exceed the applicable subtotal.
-
-- Each campaign type can be applied at most once per order.
+- The request body must contain only the `orders` field.
+- `orders` must be a non-empty array.
+- Every item must reference an existing product ID. If any ID is invalid, the request returns `400 Bad Request`.
 
 ### Example Response — 201 Created
 
 ```json
 {
-  "orderId": "1",
-
-  "subtotal": 1350,
-
-  "discount": {
-    "coupon": 100,
-
-    "onTop": 50,
-
-    "seasonal": 100
-  },
-
-  "totalDiscount": 250,
-
-  "total": 1100
+  "order": {
+    "id": "0",
+    "products": [
+      {
+        "id": "1",
+        "name": "T-Shirt",
+        "category": "clothing",
+        "price": 350,
+        "amount": 2
+      }
+    ]
+  }
 }
 ```
 
