@@ -18,10 +18,10 @@ test("POST /api/orders stores catalog products embedded in the order", async () 
   assert.equal(response.status, 201);
   assert.equal(typeof body.order.id, "string");
   assert.deepEqual(body.order.products, [
-    { ...products[0], amount: 2 },
-    { ...products[2], amount: 1 },
+    { ...products.get("1"), amount: 2 },
+    { ...products.get("3"), amount: 1 },
   ]);
-  assert.deepEqual(orders.find((order) => order.id === body.order.id), body.order);
+  assert.deepEqual(orders.get(body.order.id), body.order);
 
   const itemResponse = await orderItemRoute.GET(makeRequest("http://localhost"), {
     params: Promise.resolve({ orderId: body.order.id }),

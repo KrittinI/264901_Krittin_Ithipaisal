@@ -12,9 +12,7 @@ export function validateOrders({ orders, products }) {
       return "INVALID_PRODUCT_ID";
     }
 
-    const productExists = products.some(
-      (product) => product.id === String(order.id)
-    );
+    const productExists = products.has(String(order.id));
 
     return productExists ? null : "PRODUCT_NOT_FOUND";
   });

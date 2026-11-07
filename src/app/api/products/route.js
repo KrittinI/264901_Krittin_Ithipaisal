@@ -5,7 +5,7 @@ export async function GET(request) {
   const category = searchParams.get("category");
 
   if (category === null) {
-    return Response.json({ products }, { status: 200 });
+    return Response.json({ products: Array.from(products.values()) }, { status: 200 });
   }
 
   if (!Object.hasOwn(PRODUCT_CATEGORY, category)) {
@@ -14,7 +14,9 @@ export async function GET(request) {
 
   return Response.json(
     {
-      products: products.filter((product) => product.category === category),
+      products: Array.from(products.values()).filter(
+        (product) => product.category === category
+      ),
     },
     { status: 200 }
   );
